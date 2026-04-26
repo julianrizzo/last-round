@@ -1,50 +1,50 @@
-# Welcome to your Expo app 👋
+# Pub Race (v1)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Mobile app for running in-person Pub Race sessions with:
+- Host-created routes and join codes
+- One drink + photo proof per stop
+- GPS radius validation and stop-order validation
+- Live leaderboard powered by Supabase Realtime
 
-## Get started
+## Local setup
 
-1. Install dependencies
+1. Install dependencies:
+   - `npm install`
+2. Copy env file and fill credentials:
+   - `cp .env.example .env`
+3. Run mobile app:
+   - `npm run ios` or `npm run android`
 
-   ```bash
-   npm install
-   ```
+## Supabase setup
 
-2. Start the app
+1. Run SQL migrations in order:
+   - `supabase/migrations/001_initial_schema.sql`
+   - `supabase/migrations/002_rls_policies.sql`
+2. Create a storage bucket named `checkin-photos`.
+3. Deploy edge functions:
+   - `create_session`
+   - `join_session`
+   - `start_session`
+   - `submit_checkin`
 
-   ```bash
-   npx expo start
-   ```
+## Routes
 
-In the output, you'll find options to open the app in a
+- `app/(auth)/login.tsx`
+- `app/(host)/create-session.tsx`
+- `app/(player)/join-session.tsx`
+- `app/(race)/leaderboard.tsx`
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Testing
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Run lint: `npm run lint`
+- Run validation tests: `npm test`
 
-## Get a fresh project
+## Multiplayer verification checklist
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- Host signs in, creates session with 3+ stops, and receives join code.
+- Host appears in leaderboard as a racer before race start.
+- One player joins using join code and appears in leaderboard.
+- Host starts session and cannot edit route afterward (RLS + draft-only stop writes).
+- Both users submit check-ins in order with photo + GPS.
+- Out-of-order and outside-radius submissions are rejected/marked invalid.
+- Leaderboard updates on both devices within a few seconds.
